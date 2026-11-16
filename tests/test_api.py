@@ -90,12 +90,22 @@ def test_retrieval_ranking_prefers_matching_document(client):
     assert citations[0]["score"] > citations[1]["score"]
 
 
-def test_query_with_no_documents_is_honest(client):
-    response = client.post("/query", json={"question": "anything?"})
+def test_query_on_empty_store_seeds_sample_docs_and_answers(client):
+    # Lazy seeding: a query against an empty store ingests the sample
+    # documents first, so the preview works with zero setup. The
+    # honest empty-context message is still unit-tested at the
+    # extractive_answer level (tests/test_answering.py).
+    response = client.post("/query", json={"question": "Where is the Eiffel Tower?"})
     assert response.status_code == 200
     body = response.json()
-    assert body["citations"] == []
-    assert "No documents" in body["answer"]
+    assert "Paris" in body["answer"]
+    assert "[1]" in body["answer"]
+    assert len(body["citations"]) >= 1
+    assert body["citations"][0]["source"] == "sample-eiffel-tower.txt"
+
+    docs = client.get("/documents").json()
+    assert len(docs) == 5
+    assert all(d["source"].startswith("sample-") for d in docs)
 
 
 def test_top_k_is_respected(client):

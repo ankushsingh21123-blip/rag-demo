@@ -1,0 +1,14 @@
+# Render Blueprint: free web service, in-memory store, no env vars needed.
+# Deploy from the Render dashboard (New -> Blueprint) or the
+# "Deploy to Render" button in the README.
+services:
+  - type: web
+    name: rag-demo
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: STORE
+        value: memory
+    healthCheckPath: /health
