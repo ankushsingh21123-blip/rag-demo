@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    {
-      "destination": "/api/index.py",
-      "source": "/(.*)"
+  "functions": {
+    "app/semantic.py": {
+      "includeFiles": "app/semantic-ui.html",
+      "excludeFiles": "{tests/**,test_*.py,seed-data.json,*.png}"
     }
-  ]
+  }
 }
